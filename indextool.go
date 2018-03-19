@@ -153,7 +153,7 @@ func printMissing(word string) {
 			word)
 	}
 
-	rows, err := db.Query("select filename from tex where body match ? and filename not in (select filename from indices where name=?);",
+	rows, err := db.Query("select filename from tex where body match ? and filename not in (select filename from indices where name like '%'||?||'%');",
 		word, word)
 	check(err)
 
