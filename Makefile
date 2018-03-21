@@ -1,7 +1,9 @@
 
 
 
-all: *.go
+all: indextool
+
+indextool: *.go
 	go build
 fmt:
 	go fmt
