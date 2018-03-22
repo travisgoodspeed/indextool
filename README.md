@@ -59,11 +59,20 @@ Missing 'PaX' index in sample/ch2.tex.
 x270% 
 ```
 
-
 ## Raw Database Access
 
 IndexTool's SQLite3 database is available with a default filename of
 `indextool.db`.  You can open it to perform queries directly, if that
 would be handy.  Search for `db.Query` in `indextool.go` for example
 queries that might be handy.
+
+
+## Performance
+
+On Linux, very large datasets take a long time on the `ext4`
+filesystem, even on a modern SSD.  Considerably better performance can
+be had by storing `indextool.db` on a `tmpfs` partition.
+
+On Mac OS X, `apfs` is thirty times faster than `ext4`.  On this
+platform, I don't bother with ramdisks.
 
