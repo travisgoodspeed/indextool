@@ -122,6 +122,11 @@ func initdb() {
 
 //Inserts a record for an entire file.
 func insertTex(filename string, body string) {
+	//We don't include the .idx files in the full text searches.
+	if strings.HasSuffix(filename, ".idx") {
+		return
+	}
+
 	if verbose {
 		fmt.Printf("# Full Text Search of '%s'.\n", filename)
 	}
