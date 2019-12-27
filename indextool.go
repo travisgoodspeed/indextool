@@ -111,6 +111,7 @@ func dropdb() {
 //Create the database tables.
 func initdb() {
 	//Simple tables for the indices (.idx) and entries (.tex)
+	db.Exec("pragma synchronous = off;")
 	db.Exec("create table if not exists indices(filename, name);")
 	db.Exec("create table if not exists entries(filename, name, page);")
 
@@ -224,10 +225,10 @@ func main() {
 	deepmode = *deepmodePtr
 
 	//Re-initialize the database when given files.
-	if len(flag.Args()) > 1 {
+	if len(flag.Args()) > 0 {
 		//Initialize a fresh database.
 		opendb(*databasenamePtr)
-		dropdb() //Flush te old tables.
+		dropdb() //Flush the old tables.
 
 		//Handle the input files.
 		icount := len(flag.Args())

@@ -69,10 +69,9 @@ queries that might be handy.
 
 ## Performance
 
-On Linux, very large datasets take a long time on the `ext4`
-filesystem, even on a modern SSD.  Considerably better performance can
-be had by storing `indextool.db` on a `tmpfs` partition.
-
-On Mac OS X, `apfs` is thirty times faster than `ext4`.  On this
-platform, I don't bother with ramdisks.
+Previously, this tool was significantly faster in apfs on MacOS than
+in ext4 in Linux.  Rather than work around the performance issues
+through ramdisks, the tool now uses `pragma synchronous = off;` to
+disable all database safety.  This isn't considered a problem because
+the database is regenerated with each indexing run.
 
