@@ -195,7 +195,47 @@ func printEntryDuplicates() {
 	check(rows.Err())
 }
 
-//Prints all entries.
+//Same index capitalized differently.
+func printEntryCaps() {
+	rows, err := db.Query("select distinct a.name, b.name" +
+		" from entries a inner join entries b on (lower(a.name)==lower(b.name) and a.name<b.name)" +
+		" order by a.name asc;")
+	check(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var namea string
+		var nameb string
+		err = rows.Scan(&namea, &nameb)
+		check(err)
+
+		fmt.Printf("Entry Capitalization: %s or %s ?\n",
+			namea, nameb)
+	}
+	check(rows.Err())
+}
+
+//Same index capitalized differently.
+func printIndexCaps() {
+	rows, err := db.Query("select distinct a.name, b.name" +
+		" from indices a inner join indices b on (lower(a.name)==lower(b.name) and a.name<b.name)" +
+		" order by a.name asc;")
+	check(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var namea string
+		var nameb string
+		err = rows.Scan(&namea, &nameb)
+		check(err)
+
+		fmt.Printf("Index Capitalization: %s or %s ?\n",
+			namea, nameb)
+	}
+	check(rows.Err())
+}
+
+//Prints all Entries.
 func printEntryList() {
 	rows, err := db.Query("select distinct name from entries order by name asc;")
 	check(err)
@@ -284,16 +324,12 @@ func main() {
 		//Print the results
 		printEntryDuplicates() //Revealed entries on the same page.
 		printIndexDuplicates() //Identical entries from the same file.
+		printEntryCaps()       //Identical entries except for capitalization.
 
-		//Deep mode uses a full-text search to provide a list of
-		//entries (.idx lines) which are used but not indexed in a
-		//given file.  There will be some false positives, of course,
-		//as some terms are casually references and oughtn't be in the
-		//index.  It might take a while.
+		// Deepmode takes longer to run, and it might produce
+		// some false positives, but it's a lot more thorough.
 		if deepmode {
-			fmt.Printf("Deep mode ain't quite working yet.\n")
-
-			//select distinct name from entries;
+			printIndexCaps() //Identical entries except for capitalization.
 		}
 
 		// -l, List mode dumps a list of all entries, for
