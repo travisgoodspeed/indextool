@@ -195,6 +195,38 @@ func printEntryDuplicates() {
 	check(rows.Err())
 }
 
+//Prints all entries.
+func printEntryList() {
+	rows, err := db.Query("select distinct name from entries order by name asc;")
+	check(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		check(err)
+
+		fmt.Printf("%s\n", name)
+	}
+	check(rows.Err())
+}
+
+//Prints all Indicess.
+func printIndexList() {
+	rows, err := db.Query("select distinct name from indices order by name asc;")
+	check(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		check(err)
+
+		fmt.Printf("%s\n", name)
+	}
+	check(rows.Err())
+}
+
 //Prints duplicate indices in the same .tex file.
 func printIndexDuplicates() {
 	rows, err := db.Query("select filename, name, count(*) from indices group by filename, name having count(*)>1;")
@@ -221,6 +253,8 @@ func main() {
 	//dupcharPtr := flag.Int("dupdist", 3, "Character count before duplicate distance.")
 	verbosePtr := flag.Bool("v", false, "Verbose mode.")
 	deepmodePtr := flag.Bool("d", false, "Deep scan mode.")
+	entrylistmodePtr := flag.Bool("l", false, "Entry list mode.")
+	indexlistmodePtr := flag.Bool("L", false, "Index list mode.")
 	databasenamePtr := flag.String("f", "indextool.db", "Database filename.")
 	searchPtr := flag.String("s", "", "Search for missing word entries.")
 	flag.Parse()
@@ -260,6 +294,20 @@ func main() {
 			fmt.Printf("Deep mode ain't quite working yet.\n")
 
 			//select distinct name from entries;
+		}
+
+		// -l, List mode dumps a list of all entries, for
+		// quickly finding duplicates or near-duplicates
+		// visually.
+		if *entrylistmodePtr {
+			//select distinct name from entries order by name asc;
+			printEntryList()
+		}
+
+		// -L, longer list than above.
+		if *indexlistmodePtr {
+			//select distinct name from indices order by name asc;
+			printIndexList()
 		}
 
 		//Search for a specific missing entry.
