@@ -48,7 +48,31 @@ stage is likely a serious mistake, such as duplicate indexing.
 ```
 x270% indextool
 Duplicate entry 'PaX' on page 19.
+Entry Capitalization: JavaScript or Javascript ?
 x270%
+```
+
+Some queries are a bit more intensive, taking more than the tenth of a
+second we'd like to budget for the default tests.  These are grouped
+into "deep mode", which must be enabled separately using the `-d`
+flag.
+
+```
+dell% indextool -d
+...
+Index Capitalization: BrainFuck or Brainfuck ?
+Index Capitalization: CoreBoot or Coreboot ?
+Index Capitalization: FastColl or Fastcoll ?
+Index Capitalization: GNUPG or GnuPG ?
+Index Capitalization: GameBoy or Gameboy ?
+Index Capitalization: JavaScript or Javascript ?
+Index Capitalization: Nintendo!GameBoy or Nintendo!Gameboy ?
+Index Capitalization: PDF.JS or PDF.js ?
+Index Capitalization: PostScript or Postscript ?
+Index Capitalization: SHAttered or Shattered ?
+Index Capitalization: WINE or Wine ?
+Index Capitalization: X86 or x86 ?
+dell% 
 ```
 
 You can also perform specific queries.  For example, we can do a full
@@ -57,7 +81,6 @@ have not indexed it.
 
 ```
 x270% indextool -s PaX
-Duplicate entry 'PaX' on page 19.
 Missing 'PaX' index in sample/ch2.tex.
 x270% 
 ```
