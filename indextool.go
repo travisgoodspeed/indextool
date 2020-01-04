@@ -116,8 +116,9 @@ func initdb() {
 	db.Exec("create table if not exists entries(filename, name, page);")
 
 	//Full text search tables, for recognizing missing index entries.
-	db.Exec("create virtual table if not exists  tex using fts4(filename, body);")
-
+	db.Exec("create virtual table if not exists tex using fts4(filename, body);")
+	//Raw text, without the fancy search stuff.
+	db.Exec("create table if not exists rawtex(filename, body);")
 }
 
 //Inserts a record for an entire file.
@@ -130,7 +131,11 @@ func insertTex(filename string, body string) {
 	if verbose {
 		fmt.Printf("# Full Text Search of '%s'.\n", filename)
 	}
+	// For full text searching.
 	db.Exec("insert into tex (filename, body) values (?,?);",
+	        filename, body)
+	// For exact matching.
+	db.Exec("insert into rawtex (filename, body) values (?,?);",
 		filename, body)
 }
 
@@ -173,6 +178,35 @@ func printMissing(word string) {
 			word, filename)
 	}
 	check(rows.Err())
+}
+
+//Prints missing indexes of a given string.  Case sensitive.
+func printMissingCase(word string) {
+	if verbose {
+		fmt.Printf("# Searching for missing entries to %s.\n",
+			word)
+	}
+
+	// Temporarily become case sensitive.
+	db.Exec("PRAGMA case_sensitive_like = true;");
+	
+	rows, err := db.Query("select filename from rawtex where body like '%'||?||'%' and filename not in (select filename from indices where name like '%'||?||'%');",
+		word, word)
+	check(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var filename string
+		err = rows.Scan(&filename)
+		check(err)
+
+		fmt.Printf("Missing '%s' index in %s.\n",
+			word, filename)
+	}
+	check(rows.Err())
+
+	// Return to insensitivity.
+	db.Exec("PRAGMA case_sensitive_like = false;");
 }
 
 //Prints duplicate entries on the same page.
@@ -297,6 +331,7 @@ func main() {
 	indexlistmodePtr := flag.Bool("L", false, "Index list mode.")
 	databasenamePtr := flag.String("f", "indextool.db", "Database filename.")
 	searchPtr := flag.String("s", "", "Search for missing word entries.")
+	casesearchPtr := flag.String("S", "", "Search for missing word entries. (Case sensitive.)")
 	flag.Parse()
 
 	//Record some globals
@@ -349,6 +384,11 @@ func main() {
 		//Search for a specific missing entry.
 		if len(*searchPtr) > 0 {
 			printMissing(*searchPtr)
+		}
+
+		//Search for a specific missing entry.
+		if len(*casesearchPtr) > 0 {
+			printMissingCase(*casesearchPtr)
 		}
 
 		//Done.
