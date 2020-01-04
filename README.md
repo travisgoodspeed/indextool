@@ -72,20 +72,26 @@ Index Capitalization: PostScript or Postscript ?
 Index Capitalization: SHAttered or Shattered ?
 Index Capitalization: WINE or Wine ?
 Index Capitalization: X86 or x86 ?
-dell% 
 ```
 
 You can also perform specific queries.  For example, we can do a full
 text search for PaX, to identify all files which contain the word but
-have not indexed it.
+have *not* indexed it.
 
 ```
 x270% indextool -s PaX
 Missing 'PaX' index in sample/ch2.tex.
-x270% 
 ```
 
-We can also list the entries--those that appear in the `.idx` file of
+We can also do it in a case-sensitive manner, which is handy for words
+like `BASIC` that have very different meanings in lower case.
+
+```
+x271% indextool -S BASIC
+Missing 'BASIC' index in submissions/rabbit.tex.
+```
+
+We can list the entries--those that appear in the `.idx` file of
 the book as it is actually rendered--by `indextool -l` or the
 indices--those that appear anywhere in the source code code, even if
 they aren't rendered--by `indextool -L`.  The distinction is handy in
@@ -129,13 +135,4 @@ CREATE TABLE IF NOT EXISTS 'tex_segdir'(level INTEGER,idx INTEGER,start_block IN
 CREATE TABLE IF NOT EXISTS 'tex_docsize'(docid INTEGER PRIMARY KEY, size BLOB);
 CREATE TABLE IF NOT EXISTS 'tex_stat'(id INTEGER PRIMARY KEY, value BLOB);
 ```
-
-
-## Performance
-
-Previously, this tool was significantly faster in apfs on MacOS than
-in ext4 in Linux.  Rather than work around the performance issues
-through ramdisks, the tool now uses `pragma synchronous = off;` to
-disable all database safety.  This isn't considered a problem because
-the database is regenerated with each indexing run.
 
