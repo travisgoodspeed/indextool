@@ -158,6 +158,29 @@ func insertEntry(filename string, name string, page int) {
 }
 
 //Prints missing indexes of a given string.
+func printQuery(word string) {
+	if verbose {
+		fmt.Printf("# Searching for %s.\n", word)
+	}
+
+	rows, err := db.Query("select filename, snippet(tex, '[', ']', '...') from tex where body match ?;",
+		word)
+	check(err)
+
+	defer rows.Close()
+	for rows.Next() {
+		var filename string
+		var body string
+		err = rows.Scan(&filename, &body)
+		check(err)
+
+		fmt.Printf("%s: %s\n\n",
+			filename, body)
+	}
+	check(rows.Err())
+}
+
+//Prints missing indexes of a given string.
 func printMissing(word string) {
 	if verbose {
 		fmt.Printf("# Searching for missing entries to %s.\n",
@@ -332,6 +355,8 @@ func main() {
 	databasenamePtr := flag.String("f", "indextool.db", "Database filename.")
 	searchPtr := flag.String("s", "", "Search for missing word entries.")
 	casesearchPtr := flag.String("S", "", "Search for missing word entries. (Case sensitive.)")
+	queryPtr := flag.String("q", "", "Search for snippets of contents.")
+
 	flag.Parse()
 
 	//Record some globals
@@ -386,9 +411,14 @@ func main() {
 			printMissing(*searchPtr)
 		}
 
-		//Search for a specific missing entry.
+		//Search for a specific missing entry.  (Case sensitive.)
 		if len(*casesearchPtr) > 0 {
 			printMissingCase(*casesearchPtr)
+		}
+
+		//Search for text snippets
+		if len(*queryPtr) > 0 {
+			printQuery(*queryPtr)
 		}
 
 		//Done.
