@@ -133,7 +133,7 @@ func insertTex(filename string, body string) {
 	}
 	// For full text searching.
 	db.Exec("insert into tex (filename, body) values (?,?);",
-	        filename, body)
+		filename, body)
 	// For exact matching.
 	db.Exec("insert into rawtex (filename, body) values (?,?);",
 		filename, body)
@@ -188,8 +188,8 @@ func printMissingCase(word string) {
 	}
 
 	// Temporarily become case sensitive.
-	db.Exec("PRAGMA case_sensitive_like = true;");
-	
+	db.Exec("PRAGMA case_sensitive_like = true;")
+
 	rows, err := db.Query("select filename from rawtex where body like '%'||?||'%' and filename not in (select filename from indices where name like '%'||?||'%');",
 		word, word)
 	check(err)
@@ -206,7 +206,7 @@ func printMissingCase(word string) {
 	check(rows.Err())
 
 	// Return to insensitivity.
-	db.Exec("PRAGMA case_sensitive_like = false;");
+	db.Exec("PRAGMA case_sensitive_like = false;")
 }
 
 //Prints duplicate entries on the same page.
