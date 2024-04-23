@@ -24,7 +24,7 @@ terms.  You can make manual queries on the database without trouble.
 ## Installation
 
 IndexTool can be installed either with a traditional Unix `make clean
-install` or by `go get github.com/travisgoodspeed/indextool`.
+install` or by `go install github.com/travisgoodspeed/indextool@latest`.
 
 ## Operation
 
